@@ -319,19 +319,42 @@
 
         <h2 class="section-title">Contact</h2>
 
-        <form class="contact-form" onsubmit="return false;">
+         <form class="contact-form" id="contactForm">
 
-            <input type="text" placeholder="Your Name">
+```
+<input
+    type="text"
+    id="name"
+    name="name"
+    placeholder="Your Name"
+    required
+>
 
-            <input type="email" placeholder="Your Email">
+<input
+    type="email"
+    id="email"
+    name="email"
+    placeholder="Your Email"
+    required
+>
 
-            <textarea rows="6" placeholder="Your Message"></textarea>
+<textarea
+    id="message"
+    name="message"
+    rows="6"
+    placeholder="Your Message"
+    required
+></textarea>
 
-            <button type="button" class="send-btn">
-                Send Message
-            </button>
+<button type="submit" class="send-btn" id="sendButton">
+    Send Message
+</button>
 
-        </form>
+<p id="formStatus"></p>
+```
+
+</form>
+
 
         <div class="contact-info">
             <p>📧 yashsingh84321@gmail.com</p>
@@ -405,6 +428,56 @@
             });
         });
     </script>
+<script>
+    const contactForm = document.getElementById("contactForm");
+    const formStatus = document.getElementById("formStatus");
+    const sendButton = document.getElementById("sendButton");
+
+    if (contactForm) {
+        contactForm.addEventListener("submit", async function (event) {
+            event.preventDefault();
+
+            const name = document.getElementById("name").value.trim();
+            const email = document.getElementById("email").value.trim();
+            const message = document.getElementById("message").value.trim();
+
+            sendButton.disabled = true;
+            sendButton.textContent = "Sending...";
+            formStatus.textContent = "";
+
+            try {
+                const response = await fetch("https://portfolio-backend-zl88.onrender.com/api/messages", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        name: name,
+                        email: email,
+                        message: message
+                    })
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.message || "Message could not be sent.");
+                }
+
+                formStatus.textContent = "Message sent successfully!";
+                formStatus.style.color = "#60a5fa";
+
+                contactForm.reset();
+            } catch (error) {
+                formStatus.textContent = "Could not send message. Check that the backend is running.";
+                formStatus.style.color = "#ff8b8b";
+            } finally {
+                sendButton.disabled = false;
+                sendButton.textContent = "Send Message";
+            }
+        });
+    }
+</script>
 
 </body>
 </html>
